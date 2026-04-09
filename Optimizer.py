@@ -72,8 +72,8 @@ class Optimizer:
                     continue
                     
                 # Basic Filters (Note: minimum cost increased to 0.10 + commission)
-                #if not traded_recently or pd.isna(vol) or vol <= 0 or T_days < min_dte or T_days > max_dte or cost <= 0.12 or iv < 0.01:
-                if iv < 0.01:
+                if not traded_recently or pd.isna(vol) or vol <= 0 or T_days < min_dte or T_days > max_dte or cost <= 0.12 or iv < 0.01:
+                #if iv < 0.01:
                     continue
                     
                 # 4. Profitability at Targets (Calculated net of commissions)
@@ -106,6 +106,16 @@ class Optimizer:
                 # Penalty for low delta (Square root for non-linear weighting)
                 delta_weight = np.sqrt(abs_delta + 0.1)
                 
+                is_cheap_vol = (iv < rv) if rv else False
+                
+                # Define your custom probability weights
+                P_FAIL, R_FAIL = 0.30, -0.90
+                P_BASE = 0.40
+                P_TARGET = 0.30
+
+                # Calculate Expected ROI (The 'Edge')
+                expected_roi = round((P_FAIL * R_FAIL) + (P_BASE * roi_base) + (P_TARGET * roi_max), 3)
+                
                 # Category Logic
                 if expected_roi > 0.30 and is_cheap_vol:
                     cat = "🔥 FAT PITCH"
@@ -119,17 +129,7 @@ class Optimizer:
                     cat = "⚖️ NEUTRAL"
                 
                 # The final Scenario Score
-                scenario_score = roi * (1 + roi_base) * delta_weight
-                
-                is_cheap_vol = (iv < rv) if rv else False
-                
-                # Define your custom probability weights
-                P_FAIL, R_FAIL = 0.30, -0.90
-                P_BASE = 0.40
-                P_TARGET = 0.30
-
-                # Calculate Expected ROI (The 'Edge')
-                expected_roi = round((P_FAIL * R_FAIL) + (P_BASE * roi_base) + (P_TARGET * roi_max), 3)
+                scenario_score = roi_max * (1 + roi_base) * delta_weight
 
                 results.append({
                     'strike': K,
