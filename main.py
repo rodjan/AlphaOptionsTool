@@ -21,14 +21,14 @@ def run_analysis(ticker, drop_max, drop_base, days_to_event, min_dte):
     
     # 1. Get Live Data
     print(f"Fetching options chain and historical data...")
-    df_chain, current_price = feeder.get_option_chain(ticker)
+    df_chain, current_price, data_source = feeder.get_option_chain(ticker)
     rv = feeder.get_historical_volatility(ticker)
     
     if df_chain.empty or current_price == 0.0:
         print("Failed to fetch data or option chain is empty.")
         return
 
-    print(f"Current Price: ${current_price:.2f} | 30-Day Realized Volatility: {rv:.1%}")
+    print(f"Current Price: ${current_price:.2f} | 30-Day Realized Volatility: {rv:.1%} | Data Source: {data_source}")
     
     # Calculate max DTE (End of current calendar year)
     end_of_year = pd.Timestamp(f"{pd.Timestamp.today().year}-12-31")
@@ -58,7 +58,7 @@ def run_analysis(ticker, drop_max, drop_base, days_to_event, min_dte):
             print("🏆 TOP PUT SETUPS (Ranked by Scenario Score: ROI adjusted for Base safety):")
             columns_to_show = [
                 'strike', 'expiry', 'DTE', 'last_trade', 'vol', 'cost', 
-                'delta', 'scenario_score', 'profit_base', 'profit_max', 'ROI_base', 'ROI_max', 'expected_roi', 'cheap_vol_flag', 'category'
+                'delta', 'IV', 'score', 'pl_base', 'pl_max', 'ROI_base', 'ROI_max', 'exp_roi', 'cheap_vol', 'category'
             ]
             print(puts[columns_to_show].to_string(index=False))
         else:
@@ -70,13 +70,13 @@ if __name__ == "__main__":
     # Define a custom dictionary of strategies per ticker
     # You can specify exact drawdown parameters and time horizons per stock
     strategies = [
-        {"ticker": "VRT", "drop_max": 200, "drop_base": 250, "days_to_event": 60, "min_dte": 90}
-        ,{"ticker": "STX", "drop_max": 300, "drop_base": 400, "days_to_event": 60, "min_dte": 90}
-        ,{"ticker": "WDC", "drop_max": 170, "drop_base": 280, "days_to_event": 60, "min_dte": 90}
-        #,{"ticker": "VRT", "drop_max": 0.3, "drop_base": 0.1, "days_to_event": 60, "min_dte": 90}
-        #,{"ticker": "STX", "drop_max": 0.3, "drop_base": 0.1, "days_to_event": 60, "min_dte": 90}
-        #,{"ticker": "WDC", "drop_max": 0.3, "drop_base": 0.1, "days_to_event": 60, "min_dte": 90}        
-        #,{"ticker": "DAL", "drop_max": 0.30, "drop_base": 0.10, "days_to_event": 60, "min_dte": 90}
+        {"ticker": "VRT", "drop_max": 200, "drop_base": 250, "days_to_event": 60, "min_dte": 100}
+        ,{"ticker": "STX", "drop_max": 300, "drop_base": 400, "days_to_event": 60, "min_dte": 100}
+        ,{"ticker": "WDC", "drop_max": 170, "drop_base": 280, "days_to_event": 60, "min_dte": 100}
+        ,{"ticker": "VRT", "drop_max": 0.3, "drop_base": 0.15, "days_to_event": 60, "min_dte": 100}
+        ,{"ticker": "STX", "drop_max": 0.3, "drop_base": 0.15, "days_to_event": 60, "min_dte": 100}
+        ,{"ticker": "WDC", "drop_max": 0.3, "drop_base": 0.15, "days_to_event": 60, "min_dte": 100}        
+        #,{"ticker": "DAL", "drop_max": 0.30, "drop_base": 0.15, "days_to_event": 60, "min_dte": 90}
     ]
     
     for s in strategies:

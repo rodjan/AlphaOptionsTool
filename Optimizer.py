@@ -141,13 +141,13 @@ class Optimizer:
                     'cost': round(cost, 2), # Rounded for cleaner UI
                     'delta': round(delta_val, 2),
                     'IV': iv,
-                    'scenario_score': round(scenario_score, 3),
-                    'profit_base': profit_base,
-                    'profit_max': profit_max,
+                    'score': round(scenario_score, 3),
+                    'pl_base': profit_base,
+                    'pl_max': profit_max,
                     'ROI_base': roi_base,
                     'ROI_max': roi_max,
-                    'expected_roi': expected_roi,
-                    'cheap_vol_flag': is_cheap_vol
+                    'exp_roi': expected_roi,
+                    'cheap_vol': is_cheap_vol
                     ,'category': cat
                 })
             except Exception:
@@ -156,14 +156,14 @@ class Optimizer:
         res_df = pd.DataFrame(results)
         if not res_df.empty:
             # Sort by Scenario Score
-            res_df = res_df.sort_values(by='scenario_score', ascending=False)
+            res_df = res_df.sort_values(by='score', ascending=False)
             
             # Final Formatting
-            res_df['IV'] = (res_df['IV'] * 100).round(1).astype(str) + '%'
-            res_df['profit_base'] = res_df['profit_base'].round(2)
-            res_df['profit_max'] = res_df['profit_max'].round(2)
+            res_df['IV'] = (res_df['IV'] * 100).round(0).astype(int).astype(str) + '%'
+            res_df['pl_base'] = res_df['pl_base'].round(2)
+            res_df['pl_max'] = res_df['pl_max'].round(2)
             res_df['ROI_base'] = (res_df['ROI_base'] * 100).round(1).astype(str) + '%'
             res_df['ROI_max'] = (res_df['ROI_max'] * 100).round(1).astype(str) + '%'
-            res_df['expected_roi'] = (res_df['expected_roi'] * 100).round(1).astype(str) + '%'
+            res_df['exp_roi'] = (res_df['exp_roi'] * 100).round(1).astype(str) + '%'
             
         return res_df
