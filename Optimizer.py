@@ -160,6 +160,7 @@ class Optimizer:
             
             # Final Formatting
             res_df['IV'] = (res_df['IV'] * 100).round(0).astype(int).astype(str) + '%'
+            res_df['score'] = res_df['score'].round(2)
             res_df['pl_base'] = res_df['pl_base'].round(2)
             res_df['pl_max'] = res_df['pl_max'].round(2)
             res_df['ROI_base'] = (res_df['ROI_base'] * 100).round(1).astype(str) + '%'
